@@ -64,6 +64,41 @@ Then open <http://localhost:7011>.
 The Vite dev server proxies `/api` to the backend, so the page only ever talks to
 its own origin.
 
+### In Docker
+
+`docker compose up --build` builds the SPA, bakes it into a Node image and
+serves both from one process on <http://localhost:7010>. There is no Vite proxy
+in that setup: Express hands out the built page and answers `/api` on the same
+origin, which is what the button needs.
+
+`VITE_CLIENT_ID` is a build argument rather than an environment variable,
+because Vite inlines it into the bundle — changing it means rebuilding. The
+runtime values sit in `docker-compose.yml`, except the API key, which Compose
+reads from `server/.env` so it stays uncommitted.
+
+### Deploying
+
+```bash
+./deploy.sh
+```
+
+Builds the image locally, streams it to the server with `docker save | ssh
+docker load` (no registry), copies `docker-compose.yml` and `server/.env`, then
+restarts the container and checks `/healthz`. Target and credentials come from
+the environment:
+
+| Variable | Default |
+| --- | --- |
+| `DEPLOY_HOST` | `zzpgarantie.mayersoftwaredevelopment.nl` |
+| `DEPLOY_USER` | `root` |
+| `DEPLOY_SSH_KEY` | `~/.ssh/id_ed25519` |
+| `DEPLOY_DIR` | `/root/zzp-garantie` |
+
+`nginx.conf` is an example vhost for that host: it terminates TLS and reverse
+proxies to the container on 7010. Install it once by hand, then run
+`certbot --nginx -d zzpgarantie.mayersoftwaredevelopment.nl` — certbot rewrites
+the file to add the 443 block and the redirect. `deploy.sh` does not touch it.
+
 ### On a physical phone
 
 The wallet app fetches the disclosure request from the verification server's

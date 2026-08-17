@@ -1,0 +1,40 @@
+services:
+  zzp-garantie:
+    image: zzp-garantie:latest
+    container_name: zzp-garantie
+    restart: unless-stopped
+
+    # Only used when building here (`docker compose build`). deploy.sh builds
+    # locally and ships the image, and runs the remote side with --no-build.
+    build:
+      context: .
+      args:
+        # Vite inlines this at build time, so it lives here rather than under
+        # `environment` — changing it means rebuilding, not just restarting.
+        VITE_CLIENT_ID: zzp_garantie
+
+    ports:
+      # The container serves the SPA and /api from this one port.
+      - "7010:7010"
+
+    # The API key is the one value deliberately not written out below —
+    # server/.env.example says never to commit the real one. It comes from the
+    # same server/.env the app already uses when run from source; deploy.sh puts
+    # a copy at the same relative path on the server.
+    env_file:
+      - server/.env
+
+    # These take precedence over anything of the same name in server/.env.
+    environment:
+      PORT: 7010
+
+      # The nb-wallet-side wallet_connect. The /wc prefix is where nginx fronts
+      # it — /api/ on that host is already attestation_storage.
+      WALLET_CONNECT_URL: https://nbwallet.org/wc
+
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:7010/healthz"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
