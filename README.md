@@ -13,7 +13,7 @@ with `verification_server` forms the verification service on the nb-wallet side.
 ```
 ┌────────────────┐  /api/*  ┌──────────────┐  /api/* + api key  ┌────────────────┐
 │  React page    │─────────▶│  backend     │───────────────────▶│ wallet_connect │
-│  (Vite, 9061)  │          │  (9060)      │                    │    (9070)      │
+│  (Vite, 7011)  │          │  (7010)      │                    │    (9070)      │
 └────────────────┘          └──────────────┘                    └────────┬───────┘
         │                    holds the API key                           │
         │ nl-wallet-button → universal link                              ▼
@@ -55,11 +55,11 @@ cd ../nb-wallet/wallet_core/wallet_connect && npm install && npm run dev   # :90
 
 # this repo
 cd ../../../zzp-garantie
-(cd server && npm install && npm run dev)       # :9060
-(cd client && npm install && npm run dev)       # :9061
+(cd server && npm install && npm run dev)       # :7010
+(cd client && npm install && npm run dev)       # :7011
 ```
 
-Then open <http://localhost:9061>.
+Then open <http://localhost:7011>.
 
 The Vite dev server proxies `/api` to the backend, so the page only ever talks to
 its own origin.
@@ -68,22 +68,44 @@ its own origin.
 
 The wallet app fetches the disclosure request from the verification server's
 public listener directly, so that address has to be reachable from the phone —
-the machine's LAN IP, not `localhost`. Set `SERVICES_HOST` accordingly when
-running `setup-devenv.sh`, since it is baked into the rendered config and the
-universal links.
+the machine's LAN IP, not `localhost`. Set nb-wallet's `SERVICES_HOST` accordingly
+when running `setup-devenv.sh` there, since it is baked into the rendered config
+and the universal links. If wallet_connect then runs off-machine too, point this
+repo's `WALLET_CONNECT_URL` at the same address.
 
 ## Configuration
 
-Backend (`server/.env`, all optional):
+Copy `server/.env.example` to `server/.env` and fill it in — `.env` is gitignored.
 
 | Variable | Default | Meaning |
 | --- | --- | --- |
-| `PORT` | `9060` | Port the backend listens on |
-| `SERVICES_HOST` | `localhost` | Host wallet_connect runs on |
-| `WALLET_CONNECT_URL` | `http://$SERVICES_HOST:9070` | Upstream |
-| `WALLET_CONNECT_API_KEY` | *(demo key)* | Must match the `zzp_garantie` entry in `wallet_connect/clients.json` in the nb-wallet repo |
+| `PORT` | `7010` | Port the backend listens on |
+| `WALLET_CONNECT_URL` | `http://localhost:9070` | Upstream wallet_connect. `https://nbwallet.org/wc` for the deployed service — the `/wc` prefix is where nginx fronts it, since `/api/` on that host is attestation_storage. |
+| `WALLET_CONNECT_API_KEY` | *(none — required)* | Must match the `apiKey` on the `zzp_garantie` entry in `wallet_connect/clients.json` in the nb-wallet repo. The backend refuses to start without it. |
 
 Frontend: `VITE_CLIENT_ID` (default `zzp_garantie`).
+
+### Pointing at the deployed verification service
+
+`server/.env` ships pointed at `https://nbwallet.org/wc`. Three things must be
+true on the nb-wallet side for that to work:
+
+1. The updated `scripts/wallet-provider-nginx.conf` is installed and reloaded
+   there — it is what adds the `/wc/` location. Without it requests fall through
+   to the SPA and you get a **405** from nginx on `POST /wc/api/create-session`.
+2. `wallet_connect` is running on that host (`./scripts/start-devenv.sh wc`),
+   with `WALLET_CONNECT_PUBLIC_URL` resolving to `https://nbwallet.org/wc` so the
+   `status_url` it hands back is correct.
+3. Its `ALLOWED_ORIGINS` includes this app's origin (`http://localhost:7011` when
+   running the Vite dev server locally). The wallet button polls `status_url`
+   **directly from the browser**, so that one request is cross-origin even though
+   everything else goes through this backend:
+
+   ```bash
+   ALLOWED_ORIGINS=http://localhost:7011 ./scripts/start-devenv.sh wc
+   ```
+
+To go back to a local devenv, set `WALLET_CONNECT_URL=http://localhost:9070`.
 
 ## What is requested, and where it is pinned
 

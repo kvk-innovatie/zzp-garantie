@@ -2,22 +2,32 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const SERVICES_HOST = process.env.SERVICES_HOST || "localhost";
-
-export const PORT = Number(process.env.PORT || 9060);
-
-/** The nb-wallet-side wallet_connect server (see wallet_core/wallet_connect). */
-export const UPSTREAM =
-  process.env.WALLET_CONNECT_URL || `http://${SERVICES_HOST}:9070`;
+export const PORT = Number(process.env.PORT || 7010);
 
 /**
- * Identifies ZZP Garantie to wallet_connect, and is what keeps the disclosure
- * endpoints from being callable by anyone who can reach them. It must match the
- * `apiKey` on the `zzp_garantie` entry in `wallet_core/wallet_connect/clients.json`.
+ * The nb-wallet-side wallet_connect server (see wallet_core/wallet_connect).
  *
- * Checked in because this is a demo against a local devenv. A real relying party
- * would take it from the environment and never commit it.
+ * Locally that is the devenv on port 9070. Against the deployed service it is
+ * `https://<host>/wc` — the `/wc` prefix is where nginx fronts wallet_connect,
+ * because `/api/` on that host is already attestation_storage.
  */
-export const API_KEY =
-  process.env.WALLET_CONNECT_API_KEY ||
-  "8f2c1d5a4b90e37c6a1f8d2b4e05c973a86d1f4b2c9e70538a4d6b1c2f9e0a73";
+export const WALLET_CONNECT_URL =
+  process.env.WALLET_CONNECT_URL || "http://localhost:9070";
+
+/**
+ * Identifies ZZP Garantie to wallet_connect. Must match the `apiKey` on the
+ * `zzp_garantie` entry in wallet_connect's `clients.json`.
+ *
+ * No default on purpose: this is the credential that keeps the disclosure
+ * endpoints from being callable by anyone who can reach them, so it comes from
+ * the environment (see `.env.example`) and is never committed. Failing loudly
+ * here beats sending `Bearer undefined` and debugging a 401 from the far side.
+ */
+export const API_KEY = process.env.WALLET_CONNECT_API_KEY;
+
+if (!API_KEY) {
+  console.error(
+    "WALLET_CONNECT_API_KEY is not set — copy .env.example to .env and fill it in.",
+  );
+  process.exit(1);
+}

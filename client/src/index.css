@@ -87,6 +87,7 @@ nl-wallet-button::part(button) {
   padding: 12px 20px;
   background: var(--green);
   border-color: var(--green);
+  color: #fff;
 }
 
 nl-wallet-button::part(button):hover {
@@ -95,6 +96,9 @@ nl-wallet-button::part(button):hover {
 
 nl-wallet-button::part(button-span) {
   font-weight: 600;
+  /* The span carries its own colour, so setting it on the button alone is not
+     enough — it has to be set on the text part too. */
+  color: #fff;
 }
 
 .attributes {
@@ -159,6 +163,55 @@ button.secondary:hover {
   font-size: 0.78rem;
   line-height: 1.5;
   overflow-x: auto;
+}
+
+.integration {
+  margin-top: 1.5rem;
+}
+
+.integration-heading {
+  margin: 2rem 0 1rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--line);
+  font-size: 1.05rem;
+}
+
+.integration-heading:first-of-type {
+  margin-top: 1.5rem;
+}
+
+.step {
+  margin-bottom: 1.25rem;
+}
+
+.step h4 {
+  margin: 0 0 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+/* The highlighter owns the block's own colours, padding and radius through its
+   inline `customStyle`; only the copy button's positioning belongs here. */
+.code-block {
+  position: relative;
+}
+
+.code-block .copy {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  padding: 0.25rem 0.55rem;
+  font: inherit;
+  font-size: 0.72rem;
+  color: #d7e8dd;
+  cursor: pointer;
+}
+
+.code-block .copy:hover {
+  background: rgba(255, 255, 255, 0.18);
 }
 
 .footer {
