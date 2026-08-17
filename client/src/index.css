@@ -173,12 +173,23 @@ button.secondary:hover {
   margin-bottom: 0;
 }
 
-.card a {
+.card a,
+.footer a {
   color: var(--green);
   font-weight: 600;
 }
 
-.card a:hover {
+/* The link stays inline so it sits on the footer's baseline; the mark is sized
+   in em to track the text and nudged down to centre on it. */
+.footer a svg {
+  width: 1em;
+  height: 1em;
+  vertical-align: -0.14em;
+  margin-right: 0.35em;
+}
+
+.card a:hover,
+.footer a:hover {
   color: var(--green-dark);
 }
 
@@ -235,6 +246,12 @@ button.secondary:hover {
   margin-top: 1.5rem;
   color: var(--muted);
   font-size: 0.82rem;
+  /* Label left, GitHub link hard right; they stack if the page gets narrow. */
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+  flex-wrap: wrap;
 }
 
 .footer code {
