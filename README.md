@@ -42,27 +42,24 @@ three paths same-origin over the course of a disclosure: `/api/create-session`
 
 ## Running it
 
-Requires a devenv with `postgres`, `pid_issuer`, `wallet_provider` and
-`verification_server` up, a wallet holding an LPID, and `wallet_connect` running.
+The verification service runs on the server: `postgres`, `pid_issuer`,
+`wallet_provider`, `verification_server` and `wallet_connect` are all up on
+`nbwallet.org`, and the wallet already holds an LPID. Nothing from the nb-wallet
+repo has to run here — only this repo does.
 
 ```bash
-# in the nb-wallet repo: mint the ZZP Garantie reader certificate, render config
-cd ../nb-wallet
-./scripts/setup-devenv.sh
-./scripts/start-devenv.sh vs                    # verification_server
-
-cd ../nb-wallet/wallet_core/wallet_connect && npm install && npm run dev   # :9070
-
-# this repo
-cd ../../../zzp-garantie
+cp server/.env.example server/.env              # fill in WALLET_CONNECT_API_KEY
 (cd server && npm install && npm run dev)       # :7010
 (cd client && npm install && npm run dev)       # :7011
 ```
 
 Then open <http://localhost:7011>.
 
-The Vite dev server proxies `/api` to the backend, so the page only ever talks to
-its own origin.
+`WALLET_CONNECT_URL` points at `https://nbwallet.org/wc`, and the Vite dev server
+proxies `/api` to the backend so the API key stays server-side. One call does not
+go that way: the button polls the session status straight from the browser, which
+makes it cross-origin — so `wallet_connect` on the server has to list
+`http://localhost:7011` in its `ALLOWED_ORIGINS`.
 
 ### In Docker
 
@@ -101,12 +98,18 @@ the file to add the 443 block and the redirect. `deploy.sh` does not touch it.
 
 ### On a physical phone
 
-The wallet app fetches the disclosure request from the verification server's
-public listener directly, so that address has to be reachable from the phone —
-the machine's LAN IP, not `localhost`. Set nb-wallet's `SERVICES_HOST` accordingly
-when running `setup-devenv.sh` there, since it is baked into the rendered config
-and the universal links. If wallet_connect then runs off-machine too, point this
-repo's `WALLET_CONNECT_URL` at the same address.
+The wallet fetches the disclosure request from the verification server's public
+listener, which is on `nbwallet.org` and therefore reachable from the phone as
+it is — nothing to arrange for that half.
+
+The page is the half that has to be reachable, and `http://localhost:7011` is
+not. Either use the deployed site, or bind the dev server to the machine's LAN
+IP and add that origin to `wallet_connect`'s `ALLOWED_ORIGINS`, since the status
+polling is cross-origin:
+
+```bash
+(cd client && npm run dev -- --host)            # http://<lan-ip>:7011
+```
 
 ## Configuration
 
@@ -120,59 +123,36 @@ Copy `server/.env.example` to `server/.env` and fill it in — `.env` is gitigno
 
 Frontend: `VITE_CLIENT_ID` (default `zzp_garantie`).
 
-### Pointing at the deployed verification service
-
-`server/.env` ships pointed at `https://nbwallet.org/wc`. Three things must be
-true on the nb-wallet side for that to work:
-
-1. The updated `scripts/wallet-provider-nginx.conf` is installed and reloaded
-   there — it is what adds the `/wc/` location. Without it requests fall through
-   to the SPA and you get a **405** from nginx on `POST /wc/api/create-session`.
-2. `wallet_connect` is running on that host (`./scripts/start-devenv.sh wc`),
-   with `WALLET_CONNECT_PUBLIC_URL` resolving to `https://nbwallet.org/wc` so the
-   `status_url` it hands back is correct.
-3. Its `ALLOWED_ORIGINS` includes this app's origin (`http://localhost:7011` when
-   running the Vite dev server locally). The wallet button polls `status_url`
-   **directly from the browser**, so that one request is cross-origin even though
-   everything else goes through this backend:
-
-   ```bash
-   ALLOWED_ORIGINS=http://localhost:7011 ./scripts/start-devenv.sh wc
-   ```
-
-To go back to a local devenv, set `WALLET_CONNECT_URL=http://localhost:9070`.
-
-## What is requested, and where it is pinned
-
-Three places have to agree, and the wallet enforces the last of them:
-
-1. **`scripts/devenv/zzp_garantie_reader_auth.json`** (nb-wallet) — baked into the reader
-   certificate. The wallet refuses any request for an attribute the certificate
-   does not authorise, so this is the real boundary.
-2. **`[usecases.zzp_garantie]`** in
-   `scripts/devenv/demo_rp_verification_server.toml.template` (nb-wallet) — binds the usecase
-   to that certificate and key.
-3. **`requestedAttributes`** on the `zzp_garantie` client in
-   `wallet_connect/clients.json` in the nb-wallet repo — what is asked for per session.
-
-Widening the request means editing 1 and 3 and re-running `setup-devenv.sh` so
-the certificate is reissued. The LPID's claims are declared in
-nb-wallet's `scripts/devenv/eudi_lpid_nl_1.json`; `euid` and `legal_name` are both top-level
-and disclosed as `dc+sd-jwt`.
-
 ## The button
 
-`client/` uses `wallet-connect-button-react` from the `integration-examples` repo
-via a `file:` dependency. No `apiKey` prop is passed — that is what makes the
-component call `/api/create-session` and `/api/disclosed-attributes` same-origin,
-i.e. through the backend above. This is the "secure, via backend" variant in that
-repo's example app.
+`client/` installs `wallet-connect-button-react` from npm, and uses it like this
+([`src/App.tsx`](client/src/App.tsx)):
 
-One prop was added upstream for this setup: `deepLinkUls={false}`. wallet-connect
-derives both universal links up-front from the client id, because its server
-turns `/disclosure/{clientId}/request_uri` into a session on the fly. A plain
-nl-wallet verification server keys `request_uri` by *session token*, so the links
-can only exist once `start-url` has created the session. Setting this to `false`
-lets the web component derive them — the integration the in-repo
-`demo_relying_party` uses. Without it the wallet would be sent to
-wallet-connect.eu.
+```jsx
+<WalletConnectButton
+  clientId={CLIENT_ID}
+  nbwallet
+  label="Deel gegevens met uw business wallet"
+  lang="nl"
+  onSuccess={handleSuccess}
+/>
+```
+
+`nbwallet` is what points it at this stack: it selects `https://nbwallet.org/wc`
+as the wallet_connect host and the `businesswalletdebuginteraction://nbwallet.org`
+deep link scheme. Without it the button targets wallet-connect.eu.
+
+**No `apiKey` prop**, which is the other half of the setup. The component reads
+`apiKey ? walletConnectHost : ""` when building its URLs, so leaving it off makes
+`/api/create-session` and `/api/disclosed-attributes` same-origin — through the
+backend above, with the key never reaching the page. That is the "secure, via
+backend" variant from the wallet-connect examples. Passing `apiKey` here would
+flip both calls to direct and publish the key.
+
+`onSuccess` receives the disclosed claims at the top level (`attrs.euid`,
+`attrs.legal_name`), plus `_byCredential` carrying the per-credential detail. The
+page renders the two claims and offers the whole payload as the raw view.
+
+The one call that is *not* same-origin is the status polling: wallet_connect
+returns an absolute `status_url`, which the web component fetches straight from
+the browser. Hence the `ALLOWED_ORIGINS` requirement above.
