@@ -115,6 +115,18 @@ export default function App() {
         </section>
       )}
 
+      <section className="card wallet-cta">
+        <h2>Nog geen NB Wallet?</h2>
+        <p className="lead">
+          Delen gaat via de NB Wallet-app, met daarin het LPID van uw
+          onderneming. De app en de installatie-instructies vindt u op{" "}
+          <a href="https://nbwallet.org" target="_blank" rel="noopener noreferrer">
+            nbwallet.org
+          </a>
+          .
+        </p>
+      </section>
+
       <IntegrationExample />
 
       <footer className="footer">

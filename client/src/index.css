@@ -165,6 +165,23 @@ button.secondary:hover {
   overflow-x: auto;
 }
 
+.wallet-cta {
+  margin-top: 1.5rem;
+}
+
+.wallet-cta .lead {
+  margin-bottom: 0;
+}
+
+.card a {
+  color: var(--green);
+  font-weight: 600;
+}
+
+.card a:hover {
+  color: var(--green-dark);
+}
+
 .integration {
   margin-top: 1.5rem;
 }
