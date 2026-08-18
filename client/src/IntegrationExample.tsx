@@ -58,7 +58,7 @@ const app = express();
 
 app.use(express.json());
 
-const WALLET_CONNECT_URL = 'https://nbwallet.org/wc';
+const WALLET_CONNECT_URL = 'https://wc.nbwallet.org';
 const apiKey = 'xxx';
 
 // Forward every /api call to wallet_connect with the API key attached, so the

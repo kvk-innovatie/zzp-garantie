@@ -8,8 +8,8 @@ export const PORT = Number(process.env.PORT || 7010);
  * The nb-wallet-side wallet_connect server (see wallet_core/wallet_connect).
  *
  * Locally that is the devenv on port 9070. Against the deployed service it is
- * `https://<host>/wc` — the `/wc` prefix is where nginx fronts wallet_connect,
- * because `/api/` on that host is already attestation_storage.
+ * `https://wc.<host>` — the verification service has its own subdomain, so
+ * wallet_connect owns `/api/` there.
  */
 export const WALLET_CONNECT_URL =
   process.env.WALLET_CONNECT_URL || "http://localhost:9070";

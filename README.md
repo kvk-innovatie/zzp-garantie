@@ -55,7 +55,7 @@ cp server/.env.example server/.env              # fill in WALLET_CONNECT_API_KEY
 
 Then open <http://localhost:7011>.
 
-`WALLET_CONNECT_URL` points at `https://nbwallet.org/wc`, and the Vite dev server
+`WALLET_CONNECT_URL` points at `https://wc.nbwallet.org`, and the Vite dev server
 proxies `/api` to the backend so the API key stays server-side. One call does not
 go that way: the button polls the session status straight from the browser, which
 makes it cross-origin — so `wallet_connect` on the server has to list
@@ -118,7 +118,7 @@ Copy `server/.env.example` to `server/.env` and fill it in — `.env` is gitigno
 | Variable | Default | Meaning |
 | --- | --- | --- |
 | `PORT` | `7010` | Port the backend listens on |
-| `WALLET_CONNECT_URL` | `http://localhost:9070` | Upstream wallet_connect. `https://nbwallet.org/wc` for the deployed service — the `/wc` prefix is where nginx fronts it, since `/api/` on that host is attestation_storage. |
+| `WALLET_CONNECT_URL` | `http://localhost:9070` | Upstream wallet_connect. `https://wc.nbwallet.org` for the deployed service, which runs on its own subdomain. |
 | `WALLET_CONNECT_API_KEY` | *(none — required)* | Must match the `apiKey` on the `zzp_garantie` entry in `wallet_connect/clients.json` in the nb-wallet repo. The backend refuses to start without it. |
 
 Frontend: `VITE_CLIENT_ID` (default `zzp_garantie`).
@@ -138,7 +138,7 @@ Frontend: `VITE_CLIENT_ID` (default `zzp_garantie`).
 />
 ```
 
-`nbwallet` is what points it at this stack: it selects `https://nbwallet.org/wc`
+`nbwallet` is what points it at this stack: it selects `https://wc.nbwallet.org`
 as the wallet_connect host and the `businesswalletdebuginteraction://nbwallet.org`
 deep link scheme. Without it the button targets wallet-connect.eu.
 

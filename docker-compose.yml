@@ -28,9 +28,8 @@ services:
     environment:
       PORT: 7010
 
-      # The nb-wallet-side wallet_connect. The /wc prefix is where nginx fronts
-      # it — /api/ on that host is already attestation_storage.
-      WALLET_CONNECT_URL: https://nbwallet.org/wc
+      # The nb-wallet-side wallet_connect, on its own subdomain.
+      WALLET_CONNECT_URL: https://wc.nbwallet.org
 
     healthcheck:
       test: ["CMD", "wget", "--spider", "-q", "http://localhost:7010/healthz"]
