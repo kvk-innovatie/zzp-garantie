@@ -12,14 +12,59 @@ const CLIENT_ID = import.meta.env.VITE_CLIENT_ID || "zzp_garantie";
 
 /**
  * What the button hands to `onSuccess`: the disclosed claims themselves, at the
- * top level, exactly as the published examples assume. `_byCredential` rides
- * along under an underscore so it cannot be mistaken for a claim, and is the
- * only structure left to show in the debug view.
+ * top level, exactly as the published examples assume. Only scalar claims make
+ * it to the top level; `_byCredential` holds every claim per credential type,
+ * nested values included, so that is what the page renders.
  */
 interface DisclosedAttributes {
   euid?: string;
   legal_name?: string;
   _byCredential?: Record<string, Record<string, unknown>>;
+  [claim: string]: unknown;
+}
+
+const CREDENTIAL_NAMES: Record<string, string> = {
+  "urn:eudi:lpid:nl:1": "Legal Person Identification Data (LPID)",
+};
+
+const CLAIM_LABELS: Record<string, string> = {
+  legal_name: "Naam van de organisatie",
+  euid: "EUID",
+};
+
+function labelFor(path: string[]): string {
+  return path
+    .map((key) => CLAIM_LABELS[key] ?? key.replace(/_/g, " ").replace(/^./, (c) => c.toUpperCase()))
+    .join(" › ");
+}
+
+function formatValue(value: unknown): string {
+  if (value === null || value === undefined || value === "") return "—";
+  if (typeof value === "boolean") return value ? "ja" : "nee";
+  return String(value);
+}
+
+/** Every leaf of a claim set as [label path, value], nested objects and arrays spelled out. */
+function flattenClaims(value: unknown, path: string[] = []): [string[], unknown][] {
+  if (Array.isArray(value)) {
+    if (value.every((item) => item === null || typeof item !== "object")) {
+      return [[path, value.map(formatValue).join(", ")]];
+    }
+    return value.flatMap((item, i) => flattenClaims(item, [...path, String(i + 1)]));
+  }
+  if (value !== null && typeof value === "object") {
+    return Object.entries(value).flatMap(([key, child]) => flattenClaims(child, [...path, key]));
+  }
+  return [[path, value]];
+}
+
+/** Claims grouped per credential; top-level claims if the per-credential view is absent. */
+function groupByCredential(disclosed: DisclosedAttributes): [string, Record<string, unknown>][] {
+  const byCredential = disclosed._byCredential;
+  if (byCredential && Object.keys(byCredential).length > 0) return Object.entries(byCredential);
+
+  const topLevel = Object.fromEntries(Object.entries(disclosed).filter(([key]) => !key.startsWith("_")));
+  return Object.keys(topLevel).length > 0 ? [["", topLevel]] : [];
 }
 
 export default function App() {
@@ -61,16 +106,28 @@ export default function App() {
             cryptografisch geverifieerd.
           </p>
 
-          <dl className="attributes">
-            <div>
-              <dt>Naam van de organisatie</dt>
-              <dd>{attributes.legal_name ?? <span className="missing">niet gedeeld</span>}</dd>
+          {groupByCredential(attributes).map(([vct, claims]) => (
+            <div className="credential" key={vct || "claims"}>
+              {vct && (
+                <h3 className="credential-name">
+                  {CREDENTIAL_NAMES[vct] ?? vct}
+                  <code>{vct}</code>
+                </h3>
+              )}
+              <dl className="attributes">
+                {flattenClaims(claims).map(([path, value]) => (
+                  <div key={path.join(".")}>
+                    <dt>{labelFor(path)}</dt>
+                    <dd>{formatValue(value)}</dd>
+                  </div>
+                ))}
+              </dl>
             </div>
-            <div>
-              <dt>EUID</dt>
-              <dd>{attributes.euid ?? <span className="missing">niet gedeeld</span>}</dd>
-            </div>
-          </dl>
+          ))}
+
+          {groupByCredential(attributes).length === 0 && (
+            <p className="missing">Er zijn geen gegevens gedeeld.</p>
+          )}
 
           <div className="actions">
             <button className="secondary" onClick={() => setShowRaw((v) => !v)}>

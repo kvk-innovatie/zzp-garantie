@@ -259,3 +259,25 @@ button.secondary:hover {
   padding: 0.1rem 0.35rem;
   border-radius: 4px;
 }
+
+.credential + .credential {
+  margin-top: 1.5rem;
+}
+
+.credential-name {
+  margin: 1.25rem 0 0.25rem;
+  font-size: 0.95rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.credential-name code {
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--muted);
+  background: #e6efe9;
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+}
