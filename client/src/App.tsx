@@ -1,6 +1,7 @@
 import { useCallback, useState } from "react";
 import WalletConnectButton from "wallet-connect-button-react";
 
+import { AccountMenu } from "./AccountMenu";
 import { IntegrationExample } from "./IntegrationExample";
 
 /**
@@ -11,69 +12,83 @@ import { IntegrationExample } from "./IntegrationExample";
 const CLIENT_ID = import.meta.env.VITE_CLIENT_ID || "zzp_garantie";
 
 /**
- * What the button hands to `onSuccess`: the disclosed claims themselves, at the
- * top level, exactly as the published examples assume. Only scalar claims make
- * it to the top level; `_byCredential` holds every claim per credential type,
- * nested values included, so that is what the page renders.
+ * What the button hands to `onSuccess`, as wallet_connect shapes it:
+ *
+ *   { credentials: [ { type, name: { lang: name },
+ *                      attributes: { <claim>: { name: { lang: label }, value } } } ] }
+ *
+ * One entry per disclosed attestation. `attributes` mirrors the credential's
+ * own structure: every disclosed claim is a `{ name, value }` leaf, nested
+ * claims sit in plain objects and array-of-objects claims in arrays.
  */
-interface DisclosedAttributes {
-  euid?: string;
-  legal_name?: string;
-  _byCredential?: Record<string, Record<string, unknown>>;
-  [claim: string]: unknown;
+interface ClaimLeaf {
+  name?: Record<string, string>;
+  value?: unknown;
 }
 
-const CREDENTIAL_NAMES: Record<string, string> = {
-  "urn:eudi:lpid:nl:1": "Legal Person Identification Data (LPID)",
-};
+interface Credential {
+  type: string;
+  name?: Record<string, string>;
+  attributes?: Record<string, unknown>;
+}
 
-const CLAIM_LABELS: Record<string, string> = {
-  legal_name: "Naam van de organisatie",
-  euid: "EUID",
-};
+interface DisclosedResponse {
+  credentials?: Credential[];
+  [key: string]: unknown;
+}
 
-function labelFor(path: string[]): string {
-  return path
-    .map((key) => CLAIM_LABELS[key] ?? key.replace(/_/g, " ").replace(/^./, (c) => c.toUpperCase()))
-    .join(" › ");
+/** Dutch label if the metadata has one, else English, else any, else the fallback. */
+function displayName(names: Record<string, string> | undefined, fallback: string): string {
+  if (!names) return fallback;
+  return names["nl-NL"] ?? names["nl"] ?? names["en-US"] ?? names["en"] ?? Object.values(names)[0] ?? fallback;
+}
+
+function prettifyKey(key: string): string {
+  return key.replace(/_/g, " ").replace(/^./, (c) => c.toUpperCase());
+}
+
+function isLeaf(node: unknown): node is ClaimLeaf {
+  return typeof node === "object" && node !== null && !Array.isArray(node) && "value" in node;
 }
 
 function formatValue(value: unknown): string {
   if (value === null || value === undefined || value === "") return "—";
   if (typeof value === "boolean") return value ? "ja" : "nee";
+  if (Array.isArray(value)) return value.map(formatValue).join(", ");
+  if (typeof value === "object") return JSON.stringify(value);
   return String(value);
 }
 
-/** Every leaf of a claim set as [label path, value], nested objects and arrays spelled out. */
-function flattenClaims(value: unknown, path: string[] = []): [string[], unknown][] {
-  if (Array.isArray(value)) {
-    if (value.every((item) => item === null || typeof item !== "object")) {
-      return [[path, value.map(formatValue).join(", ")]];
-    }
-    return value.flatMap((item, i) => flattenClaims(item, [...path, String(i + 1)]));
+/** Every claim leaf as [label path, value]; nested objects and arrays spelled out. */
+function flattenClaims(node: unknown, path: string[] = []): [string[], unknown][] {
+  if (isLeaf(node)) return [[path, node.value]];
+  if (Array.isArray(node)) {
+    return node.flatMap((item, i) => flattenClaims(item, [...path.slice(0, -1), `${path[path.length - 1]} ${i + 1}`]));
   }
-  if (value !== null && typeof value === "object") {
-    return Object.entries(value).flatMap(([key, child]) => flattenClaims(child, [...path, key]));
+  if (typeof node === "object" && node !== null) {
+    return Object.entries(node).flatMap(([key, child]) =>
+      flattenClaims(child, [...path, displayName(isLeaf(child) ? child.name : undefined, prettifyKey(key))]),
+    );
   }
-  return [[path, value]];
+  return [[path, node]];
 }
 
-/** Claims grouped per credential; top-level claims if the per-credential view is absent. */
-function groupByCredential(disclosed: DisclosedAttributes): [string, Record<string, unknown>][] {
-  const byCredential = disclosed._byCredential;
-  if (byCredential && Object.keys(byCredential).length > 0) return Object.entries(byCredential);
-
-  const topLevel = Object.fromEntries(Object.entries(disclosed).filter(([key]) => !key.startsWith("_")));
-  return Object.keys(topLevel).length > 0 ? [["", topLevel]] : [];
+/** The claim stored under `key` in any credential — used for the account menu. */
+function findClaim(disclosed: DisclosedResponse | null, key: string): string | undefined {
+  for (const credential of disclosed?.credentials ?? []) {
+    const leaf = credential.attributes?.[key];
+    if (isLeaf(leaf) && leaf.value !== undefined && leaf.value !== null) return String(leaf.value);
+  }
+  return undefined;
 }
 
 export default function App() {
-  const [attributes, setAttributes] = useState<DisclosedAttributes | null>(null);
+  const [attributes, setAttributes] = useState<DisclosedResponse | null>(null);
   const [showRaw, setShowRaw] = useState(false);
 
   // Identity-stable so the button's effect doesn't re-run on every render.
   const handleSuccess = useCallback((response: Record<string, unknown> | undefined) => {
-    setAttributes((response ?? {}) as DisclosedAttributes);
+    setAttributes((response ?? {}) as DisclosedResponse);
   }, []);
 
   return (
@@ -96,28 +111,38 @@ export default function App() {
           <h1>ZZP Garantie</h1>
           <p className="tagline">Garantieregelingen voor zelfstandige ondernemers</p>
         </div>
+
+        {attributes && (
+          <AccountMenu
+            legalName={findClaim(attributes, "legal_name") ?? "Onbekende onderneming"}
+            euid={findClaim(attributes, "euid")}
+            onLogout={() => {
+              setAttributes(null);
+              setShowRaw(false);
+            }}
+          />
+        )}
       </header>
 
       {attributes ? (
         <section className="card">
-          <h2>Bedrijfsgegevens ontvangen</h2>
+          <h2>U bent ingelogd</h2>
           <p className="lead">
-            Deze gegevens komen rechtstreeks uit het LPID in uw NB Wallet en zijn
-            cryptografisch geverifieerd.
+            U bent aangemeld met de gegevens uit uw NB Wallet. Deze zijn
+            cryptografisch geverifieerd en hieronder ziet u alles wat u heeft
+            gedeeld.
           </p>
 
-          {groupByCredential(attributes).map(([vct, claims]) => (
-            <div className="credential" key={vct || "claims"}>
-              {vct && (
-                <h3 className="credential-name">
-                  {CREDENTIAL_NAMES[vct] ?? vct}
-                  <code>{vct}</code>
-                </h3>
-              )}
+          {(attributes.credentials ?? []).map((credential, index) => (
+            <div className="credential" key={`${credential.type}-${index}`}>
+              <h3 className="credential-name">
+                {displayName(credential.name, credential.type)}
+                <code>{credential.type}</code>
+              </h3>
               <dl className="attributes">
-                {flattenClaims(claims).map(([path, value]) => (
-                  <div key={path.join(".")}>
-                    <dt>{labelFor(path)}</dt>
+                {flattenClaims(credential.attributes ?? {}).map(([path, value]) => (
+                  <div key={path.join(" › ")}>
+                    <dt>{path.join(" › ")}</dt>
                     <dd>{formatValue(value)}</dd>
                   </div>
                 ))}
@@ -125,7 +150,7 @@ export default function App() {
             </div>
           ))}
 
-          {groupByCredential(attributes).length === 0 && (
+          {(attributes.credentials ?? []).length === 0 && (
             <p className="missing">Er zijn geen gegevens gedeeld.</p>
           )}
 
