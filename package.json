@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "wallet-connect-button-react": "^1.1.30"
+  }
+}
