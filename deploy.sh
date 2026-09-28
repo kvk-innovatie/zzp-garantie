@@ -40,13 +40,13 @@ info "Deploying to $USER@$HOST:$REMOTE_DIR"
 
 # --- 1. build ---------------------------------------------------------------
 
-# VITE_CLIENT_ID is read from docker-compose.yml so the two cannot drift.
-CLIENT_ID="$(sed -n 's/^ *VITE_CLIENT_ID: *//p' "$REPO_DIR/docker-compose.yml" | head -1)"
-CLIENT_ID="${CLIENT_ID:-zzp_garantie}"
+# VITE_SERVICE_ID is read from docker-compose.yml so the two cannot drift.
+SERVICE_ID="$(sed -n 's/^ *VITE_SERVICE_ID: *//p' "$REPO_DIR/docker-compose.yml" | head -1)"
+SERVICE_ID="${SERVICE_ID:-zzp_garantie}"
 
-info "Building $IMAGE:$TAG (VITE_CLIENT_ID=$CLIENT_ID)"
+info "Building $IMAGE:$TAG (VITE_SERVICE_ID=$SERVICE_ID)"
 docker build \
-  --build-arg "VITE_CLIENT_ID=$CLIENT_ID" \
+  --build-arg "VITE_SERVICE_ID=$SERVICE_ID" \
   -t "$IMAGE:$TAG" \
   "$REPO_DIR"
 

@@ -27,7 +27,7 @@ function App() {
 
   return (
     <WalletConnectButton
-      clientId="zzp_garantie"
+      serviceId="zzp_garantie"
       nbwallet
       label="Deel gegevens met uw business wallet"
       lang="nl"

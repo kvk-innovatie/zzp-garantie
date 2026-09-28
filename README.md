@@ -68,7 +68,7 @@ serves both from one process on <http://localhost:7010>. There is no Vite proxy
 in that setup: Express hands out the built page and answers `/api` on the same
 origin, which is what the button needs.
 
-`VITE_CLIENT_ID` is a build argument rather than an environment variable,
+`VITE_SERVICE_ID` is a build argument rather than an environment variable,
 because Vite inlines it into the bundle — changing it means rebuilding. The
 runtime values sit in `docker-compose.yml`, except the API key, which Compose
 reads from `server/.env` so it stays uncommitted.
@@ -121,7 +121,7 @@ Copy `server/.env.example` to `server/.env` and fill it in — `.env` is gitigno
 | `WALLET_CONNECT_URL` | `http://localhost:9070` | Upstream wallet_connect. `https://wc.nbwallet.org` for the deployed service, which runs on its own subdomain. |
 | `WALLET_CONNECT_API_KEY` | *(none — required)* | Must match the `apiKey` on the `zzp_garantie` entry in `wallet_connect/clients.json` in the nb-wallet repo. The backend refuses to start without it. |
 
-Frontend: `VITE_CLIENT_ID` (default `zzp_garantie`).
+Frontend: `VITE_SERVICE_ID` (default `zzp_garantie`).
 
 ## The button
 
@@ -130,7 +130,7 @@ Frontend: `VITE_CLIENT_ID` (default `zzp_garantie`).
 
 ```jsx
 <WalletConnectButton
-  clientId={CLIENT_ID}
+  serviceId={SERVICE_ID}
   nbwallet
   label="Deel gegevens met uw business wallet"
   lang="nl"

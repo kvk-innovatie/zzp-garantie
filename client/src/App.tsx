@@ -9,7 +9,7 @@ import { IntegrationExample } from "./IntegrationExample";
  * verification_server usecase and the attributes to request. No API key here on
  * purpose — the page calls its own backend, which attaches the key server-side.
  */
-const CLIENT_ID = import.meta.env.VITE_CLIENT_ID || "zzp_garantie";
+const SERVICE_ID = import.meta.env.VITE_SERVICE_ID || "zzp_garantie";
 
 /**
  * What the button hands to `onSuccess`, as wallet_connect shapes it:
@@ -187,7 +187,7 @@ export default function App() {
 
           <div className="button-row">
             <WalletConnectButton
-              clientId={CLIENT_ID}
+              serviceId={SERVICE_ID}
               nbwallet
               label="Deel gegevens met uw business wallet"
               lang="nl"
