@@ -16,8 +16,21 @@ export default defineConfig({
     },
   },
   optimizeDeps: {
-    // Linked via `file:`, so Vite would otherwise treat it as source and miss
-    // its prebuilt CJS/ESM bundles.
-    include: ["wallet-connect-button-react"],
+    // Pre-bundle these at startup instead of letting Vite discover them on the
+    // first page load. A dep it optimizes mid-session triggers a re-optimize
+    // plus full reload, and until that lands the page can run against a
+    // half-updated module graph — which is what makes the syntax-highlighted
+    // code blocks render as `[object Object],[object Object],…` right after an
+    // `npm install`, and why a couple of refreshes clear it.
+    include: [
+      "wallet-connect-button-react",
+      "react-syntax-highlighter",
+      // Deep entries: plain data modules, but they only exist as subpaths.
+      "react-syntax-highlighter/dist/esm/styles/prism",
+      "react-syntax-highlighter/dist/esm/languages/prism/bash",
+      "react-syntax-highlighter/dist/esm/languages/prism/css",
+      "react-syntax-highlighter/dist/esm/languages/prism/javascript",
+      "react-syntax-highlighter/dist/esm/languages/prism/jsx",
+    ],
   },
 });
