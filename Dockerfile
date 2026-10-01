@@ -3,7 +3,7 @@
 # 1. Build the SPA. Vite inlines VITE_* values into the bundle at build time, so
 #    the client id is a build argument here and not a runtime variable.
 FROM node:22-alpine AS client
-ARG VITE_SERVICE_ID=zzp_garantie
+ARG VITE_SERVICE_ID=EH_F40AC4987B1B5D62
 ENV VITE_SERVICE_ID=$VITE_SERVICE_ID
 WORKDIR /build
 COPY client/package.json client/package-lock.json ./

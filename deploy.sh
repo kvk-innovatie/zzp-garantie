@@ -42,7 +42,7 @@ info "Deploying to $USER@$HOST:$REMOTE_DIR"
 
 # VITE_SERVICE_ID is read from docker-compose.yml so the two cannot drift.
 SERVICE_ID="$(sed -n 's/^ *VITE_SERVICE_ID: *//p' "$REPO_DIR/docker-compose.yml" | head -1)"
-SERVICE_ID="${SERVICE_ID:-zzp_garantie}"
+SERVICE_ID="${SERVICE_ID:-EH_F40AC4987B1B5D62}"
 
 info "Building $IMAGE:$TAG (VITE_SERVICE_ID=$SERVICE_ID)"
 docker build \

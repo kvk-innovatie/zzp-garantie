@@ -55,7 +55,7 @@ cp server/.env.example server/.env              # fill in WALLET_CONNECT_API_KEY
 
 Then open <http://localhost:7011>.
 
-`WALLET_CONNECT_URL` points at `https://wc.nbwallet.org`, and the Vite dev server
+`WALLET_CONNECT_URL` points at `https://connect.nbwallet.org`, and the Vite dev server
 proxies `/api` to the backend so the API key stays server-side. One call does not
 go that way: the button polls the session status straight from the browser, which
 makes it cross-origin — so `wallet_connect` on the server has to list
@@ -118,10 +118,10 @@ Copy `server/.env.example` to `server/.env` and fill it in — `.env` is gitigno
 | Variable | Default | Meaning |
 | --- | --- | --- |
 | `PORT` | `7010` | Port the backend listens on |
-| `WALLET_CONNECT_URL` | `http://localhost:9070` | Upstream wallet_connect. `https://wc.nbwallet.org` for the deployed service, which runs on its own subdomain. |
-| `WALLET_CONNECT_API_KEY` | *(none — required)* | Must match the `apiKey` on the `zzp_garantie` entry in `wallet_connect/clients.json` in the nb-wallet repo. The backend refuses to start without it. |
+| `WALLET_CONNECT_URL` | `http://localhost:9070` | Upstream NB Wallet Connect. `https://connect.nbwallet.org` for the deployed service. |
+| `WALLET_CONNECT_API_KEY` | *(none — required)* | The API key NB Wallet Connect issued for service `EH_F40AC4987B1B5D62`. The backend refuses to start without it. |
 
-Frontend: `VITE_SERVICE_ID` (default `zzp_garantie`).
+Frontend: `VITE_SERVICE_ID` (default `EH_F40AC4987B1B5D62`).
 
 ## The button
 
@@ -138,9 +138,11 @@ Frontend: `VITE_SERVICE_ID` (default `zzp_garantie`).
 />
 ```
 
-`nbwallet` is what points it at this stack: it selects `https://wc.nbwallet.org`
-as the wallet_connect host and the `businesswalletdebuginteraction://nbwallet.org`
-deep link scheme. Without it the button targets wallet-connect.eu.
+`nbwallet` is what points it at this stack: it selects
+`https://connect.nbwallet.org` as the host and the `https://nbwallet.org/deeplink/`
+universal link. It is also what makes the button speak the service-id form of the
+API (`service_id`, `/api/service/...`); without it the button targets
+wallet-connect.eu, which still uses client ids.
 
 **No `apiKey` prop**, which is the other half of the setup. The component reads
 `apiKey ? walletConnectHost : ""` when building its URLs, so leaving it off makes

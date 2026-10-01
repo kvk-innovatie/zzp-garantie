@@ -9,7 +9,7 @@ import { IntegrationExample } from "./IntegrationExample";
  * verification_server usecase and the attributes to request. No API key here on
  * purpose — the page calls its own backend, which attaches the key server-side.
  */
-const SERVICE_ID = import.meta.env.VITE_SERVICE_ID || "zzp_garantie";
+const SERVICE_ID = import.meta.env.VITE_SERVICE_ID || "EH_F40AC4987B1B5D62";
 
 /**
  * What the button hands to `onSuccess`, as wallet_connect shapes it:

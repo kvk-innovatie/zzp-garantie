@@ -27,7 +27,7 @@ function App() {
 
   return (
     <WalletConnectButton
-      serviceId="zzp_garantie"
+      serviceId="EH_F40AC4987B1B5D62"
       nbwallet
       label="Deel gegevens met uw business wallet"
       lang="nl"
@@ -58,7 +58,7 @@ const app = express();
 
 app.use(express.json());
 
-const WALLET_CONNECT_URL = 'https://wc.nbwallet.org';
+const WALLET_CONNECT_URL = 'https://connect.nbwallet.org';
 const apiKey = 'xxx';
 
 // Forward every /api call to wallet_connect with the API key attached, so the

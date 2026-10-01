@@ -15,8 +15,8 @@ export const WALLET_CONNECT_URL =
   process.env.WALLET_CONNECT_URL || "http://localhost:9070";
 
 /**
- * Identifies ZZP Garantie to wallet_connect. Must match the `apiKey` on the
- * `zzp_garantie` entry in wallet_connect's `clients.json`.
+ * Identifies ZZP Garantie to NB Wallet Connect: the API key it issued for
+ * service `EH_F40AC4987B1B5D62`.
  *
  * No default on purpose: this is the credential that keeps the disclosure
  * endpoints from being callable by anyone who can reach them, so it comes from
