@@ -165,14 +165,6 @@ button.secondary:hover {
   overflow-x: auto;
 }
 
-.wallet-cta {
-  margin-top: 1.5rem;
-}
-
-.wallet-cta .lead {
-  margin-bottom: 0;
-}
-
 .card a,
 .footer a {
   color: var(--green);
