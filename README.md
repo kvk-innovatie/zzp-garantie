@@ -119,9 +119,9 @@ Copy `server/.env.example` to `server/.env` and fill it in — `.env` is gitigno
 | --- | --- | --- |
 | `PORT` | `7010` | Port the backend listens on |
 | `WALLET_CONNECT_URL` | `http://localhost:9070` | Upstream NB Wallet Connect. `https://connect.nbwallet.org` for the deployed service. |
-| `WALLET_CONNECT_API_KEY` | *(none — required)* | The API key NB Wallet Connect issued for service `EH_F40AC4987B1B5D62`. The backend refuses to start without it. |
+| `WALLET_CONNECT_API_KEY` | *(none — required)* | The API key NB Wallet Connect issued for service `EH_BA52C36292832725`. The backend refuses to start without it. |
 
-Frontend: `VITE_SERVICE_ID` (default `EH_F40AC4987B1B5D62`).
+Frontend: `VITE_SERVICE_ID` (default `EH_BA52C36292832725`).
 
 ## The button
 

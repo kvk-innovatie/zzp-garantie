@@ -10,7 +10,7 @@ import { TABS, useRoute } from "./useRoute";
  * verification_server usecase and the attributes to request. No API key here on
  * purpose — the page calls its own backend, which attaches the key server-side.
  */
-const SERVICE_ID = import.meta.env.VITE_SERVICE_ID || "EH_F40AC4987B1B5D62";
+const SERVICE_ID = import.meta.env.VITE_SERVICE_ID || "EH_BA52C36292832725";
 
 /**
  * The issuance registration, a different service than the disclosure one above:

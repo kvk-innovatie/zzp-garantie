@@ -16,7 +16,7 @@ export const WALLET_CONNECT_URL =
 
 /**
  * Identifies ZZP Garantie to NB Wallet Connect: the API key it issued for
- * service `EH_F40AC4987B1B5D62`.
+ * service `EH_BA52C36292832725`.
  *
  * No default on purpose: this is the credential that keeps the disclosure
  * endpoints from being callable by anyone who can reach them, so it comes from

@@ -11,7 +11,7 @@ services:
       args:
         # Vite inlines this at build time, so it lives here rather than under
         # `environment` — changing it means rebuilding, not just restarting.
-        VITE_SERVICE_ID: EH_F40AC4987B1B5D62
+        VITE_SERVICE_ID: EH_BA52C36292832725
         # The issuance registration behind the "add to wallet" button.
         VITE_ISSUANCE_SERVICE_ID: EH_E3081FE14CB790A8
 

@@ -27,7 +27,7 @@ function App() {
 
   return (
     <WalletConnectButton
-      serviceId="EH_F40AC4987B1B5D62"
+      serviceId="EH_BA52C36292832725"
       nbwallet
       label="Deel gegevens met uw business wallet"
       lang="nl"
