@@ -185,6 +185,29 @@ button.secondary:hover {
   color: var(--green-dark);
 }
 
+/* Issuance block inside the logged-in card, set off from the data above it. */
+.issuance {
+  margin-top: 1.75rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--line);
+}
+
+.issuance h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1.05rem;
+}
+
+.demo-note {
+  margin: 0 0 1.25rem;
+  padding: 0.75rem 0.9rem;
+  background: #fdf6e3;
+  border: 1px solid #efe0b4;
+  border-radius: 8px;
+  color: #6b5a28;
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
 .integration {
   margin-top: 1.5rem;
 }
@@ -367,4 +390,31 @@ button.secondary:hover {
 
 .account-logout {
   width: 100%;
+}
+
+/* Tab bar between the header and the page content. */
+.tabs {
+  display: flex;
+  gap: 0.25rem;
+  margin-bottom: 1.25rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.tab {
+  padding: 0.6rem 0.9rem;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.tab:hover {
+  color: var(--green);
+}
+
+.tab.active {
+  color: var(--green);
+  border-bottom-color: var(--green);
 }

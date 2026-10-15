@@ -3,6 +3,7 @@ import WalletConnectButton from "wallet-connect-button-react";
 
 import { AccountMenu } from "./AccountMenu";
 import { IntegrationExample } from "./IntegrationExample";
+import { TABS, useRoute } from "./useRoute";
 
 /**
  * Identifies ZZP Garantie to the wallet_connect server, which maps it to a
@@ -10,6 +11,14 @@ import { IntegrationExample } from "./IntegrationExample";
  * purpose — the page calls its own backend, which attaches the key server-side.
  */
 const SERVICE_ID = import.meta.env.VITE_SERVICE_ID || "EH_F40AC4987B1B5D62";
+
+/**
+ * The issuance registration, a different service than the disclosure one above:
+ * that one reads the LPID, this one writes the ZZP Garantie credential back
+ * into the wallet.
+ */
+const ISSUANCE_SERVICE_ID =
+  import.meta.env.VITE_ISSUANCE_SERVICE_ID || "EH_E3081FE14CB790A8";
 
 /**
  * What the button hands to `onSuccess`, as wallet_connect shapes it:
@@ -85,6 +94,7 @@ function findClaim(disclosed: DisclosedResponse | null, key: string): string | u
 export default function App() {
   const [attributes, setAttributes] = useState<DisclosedResponse | null>(null);
   const [showRaw, setShowRaw] = useState(false);
+  const [path, navigate] = useRoute();
 
   // Identity-stable so the button's effect doesn't re-run on every render.
   const handleSuccess = useCallback((response: Record<string, unknown> | undefined) => {
@@ -124,7 +134,60 @@ export default function App() {
         )}
       </header>
 
-      {attributes ? (
+      <nav className="tabs">
+        {TABS.map((tab) => (
+          <a
+            key={tab.path}
+            href={tab.path}
+            className={`tab${path === tab.path ? " active" : ""}`}
+            aria-current={path === tab.path ? "page" : undefined}
+            onClick={(e) => {
+              // Keep it a real link for middle-click and copy-link, but stay in
+              // the SPA for a plain left click.
+              if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+              e.preventDefault();
+              navigate(tab.path);
+            }}
+          >
+            {tab.label}
+          </a>
+        ))}
+      </nav>
+
+      {path === "/gegevens-uitgeven" ? (
+        <>
+          <section className="card">
+            <h2>Zet uw garantiecertificaat in uw wallet</h2>
+            <p className="lead">
+              Wij geven het ZZP Garantie-certificaat uit als attestatie, zodat u
+              het daarna zelf kunt delen met bijvoorbeeld een opdrachtgever of
+              bank.
+            </p>
+            <p className="demo-note">
+              Let op: dit is een demo. In een echte aanvraag krijgt u het
+              certificaat pas aan het eind van het proces aangeboden, nadat uw
+              aanvraag is beoordeeld en goedgekeurd. Hier staat de knop er
+              direct, zodat u de uitgifte meteen kunt uitproberen.
+            </p>
+
+            <div className="button-row">
+              <WalletConnectButton
+                issuance
+                serviceId={ISSUANCE_SERVICE_ID}
+                nbwallet
+                label="Voeg data toe aan je NB Wallet"
+                lang="nl"
+                // Required by the component's types. Issuance hands the credential
+                // to the wallet rather than back to this page, so there is nothing
+                // for the page to do with it.
+                onSuccess={() => {}}
+              />
+            </div>
+          </section>
+
+          <IntegrationExample kind="issue" />
+        </>
+      ) : attributes ? (
         <section className="card">
           <h2>U bent ingelogd</h2>
           <p className="lead">
@@ -197,7 +260,7 @@ export default function App() {
         </section>
       )}
 
-      <IntegrationExample />
+      {path !== "/gegevens-uitgeven" && <IntegrationExample />}
 
       <footer className="footer">
         <span>Demo relying party</span>

@@ -92,7 +92,53 @@ app.listen(7010, () => {
   console.log('Backend running on port 7010');
 });`;
 
-export function IntegrationExample() {
+const ISSUE_REACT = `import WalletConnectButton from 'wallet-connect-button-react';
+
+function App() {
+  return (
+    <WalletConnectButton
+      issuance
+      label="Voeg data toe aan je NB Wallet"
+      serviceId="EH_E3081FE14CB790A8"
+      nbwallet
+      lang="nl"
+    />
+  );
+}
+
+export default App;`;
+
+export function IntegrationExample({ kind = "receive" }: { kind?: "receive" | "issue" }) {
+  if (kind === "issue") {
+    return (
+      <section className="card integration">
+        <h2>Integratievoorbeeld</h2>
+        <p className="lead">
+          Uitgifte gaat volledig vanuit de frontend: de knop stuurt de gebruiker
+          met uw uitgever-service naar de wallet. Er is geen backend en geen
+          API-sleutel nodig, omdat er niets uit te lezen valt.
+        </p>
+
+        <h3 className="integration-heading">Frontend</h3>
+
+        <div className="step">
+          <h4>1. Install the component</h4>
+          <CodeBlock code={INSTALL} language="bash" />
+        </div>
+
+        <div className="step">
+          <h4>2. Use in your React code</h4>
+          <CodeBlock code={ISSUE_REACT} language="jsx" />
+        </div>
+
+        <div className="step">
+          <h4>3. Add custom styling (optional)</h4>
+          <CodeBlock code={STYLING} language="css" />
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="card integration">
       <h2>Integratievoorbeeld</h2>
