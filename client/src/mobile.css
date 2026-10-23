@@ -1,0 +1,456 @@
+/*
+ * The /mobile demo, after zzpgarantie.nl: dark green (#16524b) on darker green
+ * (#09332e), lime (#96d21f) for the primary action and passed checks, orange
+ * (#ff9c00) for accents and failed checks. Body copy is Sofia Sans, the
+ * display headings Sofia Sans Extra Condensed; both come from Google Fonts in
+ * index.html. Everything is scoped under .mobile so the relying-party pages
+ * keep their own look.
+ */
+
+.mobile {
+  --brand-green: #16524b;
+  --brand-dark: #09332e;
+  --brand-lime: #96d21f;
+  --brand-orange: #ff9c00;
+  --radius: 8px;
+
+  min-height: 100vh;
+  background: var(--brand-green);
+  color: #fff;
+  font-family: "Sofia Sans", ui-sans-serif, system-ui, sans-serif;
+  font-size: 18px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+.mobile * {
+  box-sizing: border-box;
+}
+
+.mobile h1,
+.mobile h2,
+.mobile h3,
+.mobile p,
+.mobile fieldset,
+.mobile legend,
+.mobile ul {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.mobile ul {
+  list-style: none;
+}
+
+/* ---------------------------------------------------------------- header */
+
+.mobile-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.9rem 1.25rem;
+  background: var(--brand-dark);
+}
+
+.mobile-logo {
+  display: block;
+  line-height: 0;
+}
+
+.mobile-logo img {
+  width: 150px;
+  height: auto;
+}
+
+.mobile-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 6px 4px;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+}
+
+.mobile-menu span {
+  display: block;
+  width: 30px;
+  height: 2px;
+  background: #fff;
+}
+
+/* ------------------------------------------------------------- the card */
+
+.mobile-check {
+  padding: 0;
+}
+
+.check-card {
+  display: flex;
+  flex-direction: column;
+  min-height: 640px;
+  padding: 2.5rem 2rem;
+  border-radius: 0.5rem;
+  background: var(--brand-green);
+}
+
+@media (min-width: 640px) {
+  .mobile-check {
+    max-width: 44rem;
+    margin: 0 auto;
+  }
+
+  .check-card {
+    padding: 2.5rem 2.75rem;
+  }
+}
+
+.check-head {
+  margin-bottom: 1.5rem;
+}
+
+.check-head h2 {
+  font-family: "Sofia Sans Extra Condensed", "Sofia Sans", sans-serif;
+  font-weight: 700;
+  font-size: 38px;
+  line-height: 1;
+  text-transform: uppercase;
+  color: var(--brand-lime);
+}
+
+.check-head p {
+  margin-top: 0.5rem;
+  font-size: 1.125rem;
+}
+
+.check-text {
+  line-height: 1.6;
+}
+
+.check-help {
+  font-size: 1rem;
+  line-height: 1.5rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.check-error {
+  margin-top: 0.75rem;
+  font-size: 1rem;
+  color: var(--brand-orange);
+}
+
+.check-warning {
+  margin-top: 1rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--brand-orange);
+  border-radius: var(--radius);
+  line-height: 1.25rem;
+  color: var(--brand-orange);
+}
+
+.muted {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* ---------------------------------------------------------------- fields */
+
+/* Prefixed with .mobile to outrank the reset above. */
+.mobile .check-field {
+  margin: 1.25rem 0;
+  min-width: 0;
+}
+
+.check-field legend,
+.check-field > label {
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.check-field > label {
+  margin-bottom: 0.25rem;
+}
+
+.check-input {
+  width: 100%;
+  height: 2.75rem;
+  padding: 0 0.75rem;
+  border: 0;
+  border-radius: var(--radius);
+  background: #fff;
+  color: var(--brand-dark);
+  font: inherit;
+  font-size: 1.125rem;
+  outline: none;
+}
+
+.check-input:focus {
+  box-shadow: 0 0 0 2px var(--brand-lime);
+}
+
+.check-input::placeholder {
+  color: #9ca3af;
+}
+
+/* ja / nee */
+.choice-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.choice {
+  height: 2.25rem;
+  padding: 0 1.25rem;
+  border: 0;
+  border-radius: var(--radius);
+  background: var(--brand-dark);
+  color: #fff;
+  font: inherit;
+  font-size: 1.125rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: filter 0.15s;
+}
+
+.choice:hover {
+  filter: brightness(1.25);
+}
+
+.choice.selected {
+  background: var(--brand-lime);
+  color: var(--brand-dark);
+}
+
+.choice.selected:hover {
+  filter: none;
+}
+
+/* radio options */
+.radio-list {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.radio {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* the rotated-square marker used for options and for result lines */
+.diamond {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 1.375rem;
+  height: 1.375rem;
+  transform: rotate(45deg);
+  background: var(--brand-dark);
+  color: var(--brand-dark);
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+/* The glyph counter-rotates so it reads upright inside the diamond. */
+.diamond .glyph {
+  transform: rotate(-45deg);
+}
+
+.diamond.small {
+  width: 0.875rem;
+  height: 0.875rem;
+}
+
+.diamond.lime {
+  background: var(--brand-lime);
+}
+
+.diamond.orange {
+  background: var(--brand-orange);
+}
+
+.diamond.dark {
+  background: var(--brand-dark);
+}
+
+.diamond.pulse {
+  animation: mobile-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes mobile-pulse {
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* ---------------------------------------------------------------- result */
+
+.result-list {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.result-list.checking {
+  margin-top: 1rem;
+  gap: 1rem;
+}
+
+.result-list li {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.result-group {
+  margin-bottom: 1.25rem;
+}
+
+.result-group h3 {
+  margin-bottom: 0.5rem;
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+/* Fixed to the bottom of the screen on the result page. The card gets extra
+   bottom padding so its own footer is not hidden behind the bar. */
+.wallet-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+  padding: 1rem 1.25rem calc(1rem + env(safe-area-inset-bottom));
+  background: var(--brand-dark);
+  box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.25);
+}
+
+.check-card.with-wallet-bar {
+  padding-bottom: 6.5rem;
+}
+
+/* The wallet button is a web component; restyle its parts to the lime
+   primary button so it sits with the rest of the card. */
+.mobile nl-wallet-button::part(button) {
+  width: 100%;
+  height: 3rem;
+  padding: 0 1.5rem;
+  border: 0;
+  border-radius: var(--radius);
+  background: var(--brand-lime);
+  color: var(--brand-dark);
+  font-family: inherit;
+  font-size: 1.125rem;
+  font-weight: 700;
+  transition: filter 0.15s;
+}
+
+.mobile nl-wallet-button::part(button):hover {
+  background: var(--brand-lime);
+  filter: brightness(1.05);
+}
+
+.mobile nl-wallet-button::part(button-span) {
+  color: var(--brand-dark);
+  font-weight: 700;
+}
+
+/* ------------------------------------------------------------------- nav */
+
+.check-nav {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  padding-top: 2rem;
+}
+
+.btn {
+  height: 2.75rem;
+  padding: 0 1.5rem;
+  border: 0;
+  border-radius: var(--radius);
+  font: inherit;
+  font-size: 1.125rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: filter 0.15s;
+}
+
+.btn.dark {
+  background: var(--brand-dark);
+  color: #fff;
+}
+
+.btn.dark:hover {
+  filter: brightness(1.25);
+}
+
+.btn.dark:disabled {
+  color: rgba(255, 255, 255, 0.4);
+  cursor: not-allowed;
+  filter: none;
+}
+
+.btn.primary {
+  background: var(--brand-lime);
+  color: var(--brand-dark);
+}
+
+.btn.primary:hover {
+  filter: brightness(1.05);
+}
+
+.progress {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 0.5rem;
+  height: 2.75rem;
+  padding: 0 0.75rem;
+  border-radius: var(--radius);
+  background: var(--brand-dark);
+  font-size: 1.125rem;
+}
+
+.progress span {
+  white-space: nowrap;
+}
+
+.progress-track {
+  flex: 1;
+  height: 0.5rem;
+  overflow: hidden;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 9999px;
+  background: var(--brand-lime);
+}
+
+@media (max-width: 400px) {
+  .check-nav {
+    flex-wrap: wrap;
+  }
+
+  .progress {
+    flex-basis: 100%;
+  }
+}
