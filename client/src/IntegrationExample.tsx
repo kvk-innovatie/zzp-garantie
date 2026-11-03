@@ -8,9 +8,9 @@ import { CodeBlock } from "./CodeBlock";
  * the key attached server-side.
  */
 
-const INSTALL = "npm install wallet-connect-button-react@latest";
+const INSTALL = "npm install nb-wallet-connect-button-react@latest";
 
-const REACT = `import WalletConnectButton from 'wallet-connect-button-react';
+const REACT = `import { WalletConnectButton } from 'nb-wallet-connect-button-react';
 import { useState } from 'react';
 
 function App() {
@@ -28,7 +28,6 @@ function App() {
   return (
     <WalletConnectButton
       serviceId="EH_BA52C36292832725"
-      nbwallet
       label="Deel gegevens met uw business wallet"
       lang="nl"
       onSuccess={(attrs) => {
@@ -41,13 +40,13 @@ function App() {
 export default App;`;
 
 const STYLING = `/* Add to your CSS file */
-nl-wallet-button::part(button) {
+.wcb-button {
   border-radius: 6px;
   padding: 12px 20px;
   margin: 4px;
 }
 
-nl-wallet-button::part(button-span) {
+.wcb-button__label {
   font-weight: bold;
 }`;
 
@@ -92,7 +91,7 @@ app.listen(7010, () => {
   console.log('Backend running on port 7010');
 });`;
 
-const ISSUE_REACT = `import WalletConnectButton from 'wallet-connect-button-react';
+const ISSUE_REACT = `import { WalletConnectButton } from 'nb-wallet-connect-button-react';
 
 function App() {
   return (
@@ -100,7 +99,6 @@ function App() {
       issuance
       label="Voeg data toe aan je NB Wallet"
       serviceId="EH_E3081FE14CB790A8"
-      nbwallet
       lang="nl"
     />
   );

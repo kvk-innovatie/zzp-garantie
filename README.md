@@ -16,7 +16,7 @@ with `verification_server` forms the verification service on the nb-wallet side.
 │  (Vite, 7011)  │          │  (7010)      │                    │    (9070)      │
 └────────────────┘          └──────────────┘                    └────────┬───────┘
         │                    holds the API key                           │
-        │ nl-wallet-button → universal link                              ▼
+        │ wallet button → universal link                                 ▼
         ▼                                              verification_server (9011/9012)
    NB Wallet app ──────────────────────────────────────────────▶ public listener
 ```
@@ -125,24 +125,25 @@ Frontend: `VITE_SERVICE_ID` (default `EH_BA52C36292832725`).
 
 ## The button
 
-`client/` installs `wallet-connect-button-react` from npm, and uses it like this
+`client/` installs `nb-wallet-connect-button-react` from npm, and uses it like this
 ([`src/App.tsx`](client/src/App.tsx)):
 
 ```jsx
 <WalletConnectButton
   serviceId={SERVICE_ID}
-  nbwallet
   label="Deel gegevens met uw business wallet"
   lang="nl"
   onSuccess={handleSuccess}
 />
 ```
 
-`nbwallet` is what points it at this stack: it selects
-`https://connect.nbwallet.org` as the host and the `https://nbwallet.org/deeplink/`
-universal link. It is also what makes the button speak the service-id form of the
-API (`service_id`, `/api/service/...`); without it the button targets
-wallet-connect.eu, which still uses client ids.
+The package is NB Wallet's own build of the button (version 2.0 onwards), so it
+already points at this stack: `https://connect.nbwallet.org` as the host, the
+`https://nbwallet.org/deeplink/` universal link, and the service-id form of the
+API (`service_id`, `/api/service/...`). The former `nbwallet` prop, which used
+to select all that on the generic `wallet-connect-button-react`, is no longer
+needed. The button is plain React markup: style it through the `.wcb-button`
+and `.wcb-button__label` classes, or the `className` / `classes` props.
 
 **No `apiKey` prop**, which is the other half of the setup. The component reads
 `apiKey ? walletConnectHost : ""` when building its URLs, so leaving it off makes

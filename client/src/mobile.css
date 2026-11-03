@@ -343,9 +343,9 @@
   padding-bottom: 6.5rem;
 }
 
-/* The wallet button is a web component; restyle its parts to the lime
-   primary button so it sits with the rest of the card. */
-.mobile nl-wallet-button::part(button) {
+/* The wallet button ships its own look; restyle it to the lime primary
+   button so it sits with the rest of the card. */
+.mobile .wcb-button {
   width: 100%;
   height: 3rem;
   padding: 0 1.5rem;
@@ -359,12 +359,12 @@
   transition: filter 0.15s;
 }
 
-.mobile nl-wallet-button::part(button):hover {
+.mobile .wcb-button:hover {
   background: var(--brand-lime);
   filter: brightness(1.05);
 }
 
-.mobile nl-wallet-button::part(button-span) {
+.mobile .wcb-button__label {
   color: var(--brand-dark);
   font-weight: 700;
 }

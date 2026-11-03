@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import WalletConnectButton from "wallet-connect-button-react";
+import { WalletConnectButton, type DisclosedAttributesResponse } from "nb-wallet-connect-button-react";
 
 import { AccountMenu } from "./AccountMenu";
 import { IntegrationExample } from "./IntegrationExample";
@@ -84,7 +84,7 @@ export default function App() {
   const [path, navigate] = useRoute();
 
   // Identity-stable so the button's effect doesn't re-run on every render.
-  const handleSuccess = useCallback((response: Record<string, unknown> | undefined) => {
+  const handleSuccess = useCallback((response: DisclosedAttributesResponse | undefined) => {
     setAttributes((response ?? {}) as DisclosedResponse);
   }, []);
 
@@ -165,7 +165,6 @@ export default function App() {
               <WalletConnectButton
                 issuance
                 serviceId={ISSUANCE_SERVICE_ID}
-                nbwallet
                 label="Voeg data toe aan je NB Wallet"
                 lang="nl"
                 // Required by the component's types. Issuance hands the credential
@@ -242,7 +241,6 @@ export default function App() {
           <div className="button-row">
             <WalletConnectButton
               serviceId={SERVICE_ID}
-              nbwallet
               label="Deel gegevens met uw business wallet"
               lang="nl"
               onSuccess={handleSuccess}

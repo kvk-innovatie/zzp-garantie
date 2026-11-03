@@ -81,8 +81,8 @@ body {
   justify-content: flex-start;
 }
 
-/* The button is a web component; style it through its exposed parts. */
-nl-wallet-button::part(button) {
+/* The button is plain markup with stable class names; style those. */
+.wcb-button {
   border-radius: 6px;
   padding: 12px 20px;
   background: var(--green);
@@ -90,14 +90,12 @@ nl-wallet-button::part(button) {
   color: #fff;
 }
 
-nl-wallet-button::part(button):hover {
+.wcb-button:hover {
   background: var(--green-dark);
 }
 
-nl-wallet-button::part(button-span) {
+.wcb-button__label {
   font-weight: 600;
-  /* The span carries its own colour, so setting it on the button alone is not
-     enough — it has to be set on the text part too. */
   color: #fff;
 }
 

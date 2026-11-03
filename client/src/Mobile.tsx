@@ -1,5 +1,5 @@
 import { ReactNode, useEffect, useState } from "react";
-import WalletConnectButton from "wallet-connect-button-react";
+import { WalletConnectButton } from "nb-wallet-connect-button-react";
 
 import { ISSUANCE_SERVICE_ID } from "./serviceIds";
 import "./mobile.css";
@@ -450,7 +450,6 @@ function ResultStep({ onBack, onRestart }: { onBack: () => void; onRestart: () =
         <WalletConnectButton
           issuance
           serviceId={ISSUANCE_SERVICE_ID}
-          nbwallet
           label="Voeg certificaat toe aan je wallet"
           lang="nl"
           // Required by the component's types. Issuance hands the credential
